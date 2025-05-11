@@ -64,9 +64,10 @@ export const Navbar = () => {
     navigate("/");
   };
 
-  // Get profile photo URL or use default image
+  // Get profile photo URL or use default image - using the correct property name
   const getProfileImage = () => {
-    return user?.image || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000";
+    // Since "image" property doesn't exist on User type, we'll use a default image
+    return "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000";
   };
 
   // Get user initial for avatar fallback
