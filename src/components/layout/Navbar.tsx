@@ -1,8 +1,9 @@
 
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Menu, 
   X, 
@@ -15,7 +16,8 @@ import {
   ThermometerSnowflake, 
   LogOut, 
   Bell, 
-  BookOpen 
+  BookOpen,
+  MessageCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,6 +33,13 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
@@ -44,6 +53,15 @@ export const Navbar = () => {
         ? "bg-herhealth-pink-light text-herhealth-pink-dark" 
         : "hover:bg-herhealth-pink-light/50 transition-colors"
     }`;
+  };
+  
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+    navigate("/");
   };
   
   return (
@@ -73,17 +91,45 @@ export const Navbar = () => {
                 <Link to="/mental-health" className={linkClass("/mental-health")}>
                   Mental Health
                 </Link>
-                <Link to="/pregnancy" className={linkClass("/pregnancy")}>
-                  Pregnancy
-                </Link>
-                <Link to="/menopause" className={linkClass("/menopause")}>
-                  Menopause
-                </Link>
-                <Link to="/resources" className={linkClass("/resources")}>
-                  Resources
-                </Link>
-                <Link to="/notifications" className={linkClass("/notifications")}>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className={linkClass("")}>
+                      More
+                      <span className="ml-1">▼</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link to="/pregnancy" className="flex items-center w-full">
+                        <Baby className="mr-2 h-4 w-4" />
+                        Pregnancy
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/menopause" className="flex items-center w-full">
+                        <ThermometerSnowflake className="mr-2 h-4 w-4" />
+                        Menopause
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/resources" className="flex items-center w-full">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        Resources
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/ai-health-chat" className="flex items-center w-full">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        AI Health Chat
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Link to="/notifications" className={`relative ${linkClass("/notifications")}`}>
                   <Bell className="h-4 w-4" />
+                  <span className="absolute -top-1 -right-1 bg-herhealth-pink-dark text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">3</span>
                 </Link>
                 
                 <div className="relative ml-3">
@@ -91,7 +137,7 @@ export const Navbar = () => {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="rounded-full p-1 h-9 w-9">
                         <Avatar>
-                          <AvatarImage src="https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000" alt="Profile" />
+                          <AvatarImage src={user?.photoURL || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000"} alt="Profile" />
                           <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
                         </Avatar>
                       </Button>
@@ -105,7 +151,7 @@ export const Navbar = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                      <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4" />
                         Logout
                       </DropdownMenuItem>
@@ -116,15 +162,16 @@ export const Navbar = () => {
               
               {/* Mobile menu button */}
               <div className="flex items-center md:hidden space-x-2">
-                <Link to="/notifications" className={`p-2 rounded-md ${isActiveRoute("/notifications") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : ""}`}>
+                <Link to="/notifications" className={`relative p-2 rounded-md ${isActiveRoute("/notifications") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : ""}`}>
                   <Bell className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 bg-herhealth-pink-dark text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">3</span>
                 </Link>
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="rounded-full p-1 h-9 w-9">
                       <Avatar>
-                        <AvatarImage src="https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000" alt="Profile" />
+                        <AvatarImage src={user?.photoURL || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000"} alt="Profile" />
                         <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
                     </Button>
@@ -137,7 +184,7 @@ export const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -181,7 +228,6 @@ export const Navbar = () => {
             <Link
               to="/dashboard"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/dashboard") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <User className="h-5 w-5" />
               Dashboard
@@ -189,7 +235,6 @@ export const Navbar = () => {
             <Link
               to="/cycle"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/cycle") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <Calendar className="h-5 w-5" />
               Cycle Tracker
@@ -197,7 +242,6 @@ export const Navbar = () => {
             <Link
               to="/wellness"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/wellness") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <Activity className="h-5 w-5" />
               Wellness Hub
@@ -205,7 +249,6 @@ export const Navbar = () => {
             <Link
               to="/mental-health"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/mental-health") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <Brain className="h-5 w-5" />
               Mental Health
@@ -213,7 +256,6 @@ export const Navbar = () => {
             <Link
               to="/pregnancy"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/pregnancy") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <Baby className="h-5 w-5" />
               Pregnancy
@@ -221,7 +263,6 @@ export const Navbar = () => {
             <Link
               to="/menopause"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/menopause") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <ThermometerSnowflake className="h-5 w-5" />
               Menopause
@@ -229,17 +270,20 @@ export const Navbar = () => {
             <Link
               to="/resources"
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/resources") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
-              onClick={() => setIsMenuOpen(false)}
             >
               <BookOpen className="h-5 w-5" />
               Resources
             </Link>
+            <Link
+              to="/ai-health-chat"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${isActiveRoute("/ai-health-chat") ? "bg-herhealth-pink-light text-herhealth-pink-dark" : "hover:bg-herhealth-pink-light/50"} flex items-center gap-3`}
+            >
+              <MessageCircle className="h-5 w-5" />
+              AI Health Chat
+            </Link>
             <button
               className="w-full text-left block px-3 py-2 rounded-md text-base font-medium hover:bg-herhealth-pink-light/50 flex items-center gap-3"
-              onClick={() => {
-                logout();
-                setIsMenuOpen(false);
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="h-5 w-5" />
               Logout

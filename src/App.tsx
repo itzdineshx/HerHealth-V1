@@ -1,5 +1,5 @@
 
-import React, { Suspense } from "react";
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,31 +10,41 @@ import ErrorBoundary from "./components/layout/ErrorBoundary";
 import ScrollToTop from "./utils/ScrollToTop";
 
 // Pages
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import OnboardingPage from "./pages/OnboardingPage";
-import DashboardPage from "./pages/DashboardPage";
-import CycleTrackerPage from "./pages/CycleTrackerPage";
-import WellnessHubPage from "./pages/WellnessHubPage";
-import MentalHealthPage from "./pages/MentalHealthPage";
-import PregnancyPage from "./pages/PregnancyPage";
-import MenopausePage from "./pages/MenopausePage";
-import ResourcesPage from "./pages/ResourcesPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import TermsPage from "./pages/TermsPage";
-import UserProfilePage from "./pages/UserProfilePage";
-import AIHealthChatPage from "./pages/AIHealthChatPage";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import ContactPage from "./pages/ContactPage";
+const HomePage = lazy(() => import("./pages/HomePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const SignupPage = lazy(() => import("./pages/SignupPage"));
+const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const CycleTrackerPage = lazy(() => import("./pages/CycleTrackerPage"));
+const WellnessHubPage = lazy(() => import("./pages/WellnessHubPage"));
+const MentalHealthPage = lazy(() => import("./pages/MentalHealthPage"));
+const PregnancyPage = lazy(() => import("./pages/PregnancyPage"));
+const MenopausePage = lazy(() => import("./pages/MenopausePage"));
+const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
+const AIHealthChatPage = lazy(() => import("./pages/AIHealthChatPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
 
+// Loading Component
+const LoadingSpinner = () => (
+  <div className="h-screen w-screen flex flex-col items-center justify-center">
+    <div className="w-16 h-16 border-4 border-herhealth-pink-light border-t-herhealth-pink-dark rounded-full animate-spin"></div>
+    <p className="mt-4 text-herhealth-pink-dark">Loading...</p>
+  </div>
+);
+
+// Create QueryClient with improved caching settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
@@ -48,7 +58,7 @@ const App: React.FC = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
-            <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading...</div>}>
+            <Suspense fallback={<LoadingSpinner />}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -67,9 +77,16 @@ const App: React.FC = () => (
                 <Route path="/ai-health-chat" element={<AIHealthChatPage />} />
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                
+                {/* Additional pages mentioned in footer */}
+                <Route path="/support" element={<ContactPage />} />  {/* Reuse ContactPage for now */}
+                <Route path="/cookies" element={<PrivacyPolicyPage />} />  {/* Reuse PrivacyPage for now */}
+                <Route path="/accessibility" element={<TermsPage />} />  {/* Reuse TermsPage for now */}
+                
                 {/* Redirect /index.html to home page */}
                 <Route path="/index.html" element={<Navigate to="/" replace />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                
+                {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

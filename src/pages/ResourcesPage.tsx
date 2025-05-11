@@ -1,11 +1,14 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Search, Filter, Clock, ArrowRight, Heart, Brain, Baby, ThermometerSnowflake, Activity } from "lucide-react";
+import { BookOpen, Search, Filter, Clock, ArrowRight, Heart, Brain, Baby, ThermometerSnowflake, Activity, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { fetchArticles } from "@/services/apiService";
 
 interface ResourceArticle {
   id: string;
@@ -14,21 +17,78 @@ interface ResourceArticle {
   category: "menopause" | "mentalhealth" | "pregnancy" | "general" | "wellness";
   readTime: number;
   imageSrc: string;
+  url?: string;
   featured?: boolean;
 }
 
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [articles, setArticles] = useState<ResourceArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
-  const articles: ResourceArticle[] = [
+  useEffect(() => {
+    // Load articles from API or use mock data
+    const loadArticles = async () => {
+      try {
+        setLoading(true);
+        // Try to fetch articles from API
+        const apiArticles = await fetchArticles(activeCategory !== "all" ? activeCategory : undefined);
+        
+        // If we got articles from API, use them
+        if (apiArticles && apiArticles.length > 0) {
+          const formattedArticles: ResourceArticle[] = apiArticles.map(article => ({
+            id: article.id,
+            title: article.title,
+            description: article.summary,
+            category: article.category === "mental" ? "mentalhealth" : 
+                     article.category === "pregnancy" || article.category === "menopause" ? article.category : "wellness",
+            readTime: Math.floor(article.content.length / 1000) + 5, // Estimate read time based on content length
+            imageSrc: article.imageUrl || "/placeholder.svg",
+            featured: false
+          }));
+          
+          // Mark a few as featured
+          if (formattedArticles.length > 0) {
+            formattedArticles[0].featured = true;
+          }
+          if (formattedArticles.length > 3) {
+            formattedArticles[3].featured = true;
+          }
+          
+          setArticles(formattedArticles);
+        } else {
+          // Fall back to default mock data
+          setArticles(defaultArticles);
+        }
+      } catch (error) {
+        console.error("Error loading articles:", error);
+        toast({
+          title: "Error loading resources",
+          description: "Failed to load resource articles. Using default content.",
+          variant: "destructive"
+        });
+        setArticles(defaultArticles);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadArticles();
+  }, [activeCategory, toast]);
+  
+  // Default articles data
+  const defaultArticles: ResourceArticle[] = [
     {
       id: "1",
       title: "Understanding Perimenopause: Early Signs and Symptoms",
       description: "Learn about the early warning signs of perimenopause and how to manage the transition.",
       category: "menopause",
       readTime: 8,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.mayoclinic.org/diseases-conditions/perimenopause/symptoms-causes/syc-20354666",
       featured: true
     },
     {
@@ -37,7 +97,8 @@ const ResourcesPage = () => {
       description: "Explore how hormonal changes throughout your life can impact your mental wellbeing.",
       category: "mentalhealth",
       readTime: 12,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1505455184862-554165e5f6ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.womenshealth.gov/mental-health/mental-health-conditions/depression"
     },
     {
       id: "3",
@@ -45,7 +106,8 @@ const ResourcesPage = () => {
       description: "A comprehensive guide to nutrition needs during each stage of pregnancy.",
       category: "pregnancy",
       readTime: 15,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1595924736292-f0e1c3d2a8cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy"
     },
     {
       id: "4",
@@ -53,7 +115,8 @@ const ResourcesPage = () => {
       description: "Evidence-based approaches to managing hot flashes during menopause.",
       category: "menopause",
       readTime: 7,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1559662780-c3bab6f7e00b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.menopause.org/for-women/menopauseflashes/menopause-symptoms-and-treatments/managing-hot-flashes"
     },
     {
       id: "5",
@@ -61,7 +124,8 @@ const ResourcesPage = () => {
       description: "How to create and maintain a self-care practice that fits your lifestyle.",
       category: "wellness",
       readTime: 5,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.nih.gov/health-information/emotional-wellness-toolkit",
       featured: true
     },
     {
@@ -70,7 +134,8 @@ const ResourcesPage = () => {
       description: "A detailed look at each phase of your cycle and how it affects your body and mind.",
       category: "general",
       readTime: 10,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1584805646889-c9ba8e3ebc23?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle"
     },
     {
       id: "7",
@@ -78,7 +143,8 @@ const ResourcesPage = () => {
       description: "The latest research on HRT to help you make an informed decision with your healthcare provider.",
       category: "menopause",
       readTime: 14,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.nia.nih.gov/health/hormone-replacement-therapy-menopause-symptoms-risks"
     },
     {
       id: "8",
@@ -86,7 +152,8 @@ const ResourcesPage = () => {
       description: "Simple mindfulness techniques you can practice daily to reduce anxiety.",
       category: "mentalhealth",
       readTime: 6,
-      imageSrc: "/placeholder.svg",
+      imageSrc: "https://images.unsplash.com/photo-1592554379916-8e6bf5f17aa3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      url: "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
     }
   ];
   
@@ -107,6 +174,17 @@ const ResourcesPage = () => {
   const featuredArticles = articles.filter(article => article.featured);
   const filteredArticles = filterArticles();
   
+  const handleArticleClick = (article: ResourceArticle) => {
+    if (article.url) {
+      window.open(article.url, '_blank');
+    } else {
+      toast({
+        title: "Content coming soon",
+        description: "This article will be available soon. Please check back later.",
+      });
+    }
+  };
+  
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "menopause":
@@ -122,9 +200,24 @@ const ResourcesPage = () => {
     }
   };
 
+  const getRelatedCategories = () => {
+    switch (activeCategory) {
+      case "menopause":
+        return ["Menopause Symptoms", "HRT", "Post-menopause", "Perimenopause"];
+      case "mentalhealth":
+        return ["Anxiety", "Depression", "Stress Management", "Self-Care"];
+      case "pregnancy":
+        return ["First Trimester", "Nutrition", "Exercise", "Postpartum"];
+      case "wellness":
+        return ["Fitness", "Nutrition", "Sleep", "Mindfulness"];
+      default:
+        return ["Popular Topics", "Latest Articles", "Most Read", "Editor's Choice"];
+    }
+  };
+
   return (
     <AppLayout>
-      <div className="py-8 bg-gradient-to-b from-herhealth-pink-light/30 to-white">
+      <div className="py-8 bg-gradient-to-b from-herhealth-pink-light/30 to-white animate-in">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold flex items-center">
@@ -140,12 +233,15 @@ const ResourcesPage = () => {
               <h2 className="text-xl font-semibold mb-4">Featured Resources</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {featuredArticles.map((article) => (
-                  <Card key={article.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <Card key={article.id} className="overflow-hidden hover:shadow-md transition-shadow hover-scale cursor-pointer" onClick={() => handleArticleClick(article)}>
                     <div className="bg-gray-100 h-48">
                       <img 
                         src={article.imageSrc} 
                         alt={article.title} 
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/placeholder.svg";
+                        }}
                       />
                     </div>
                     <CardHeader>
@@ -162,7 +258,7 @@ const ResourcesPage = () => {
                     <CardFooter>
                       <Button variant="ghost" className="text-herhealth-pink-dark hover:text-herhealth-pink flex items-center">
                         Read Article
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        {article.url ? <ExternalLink className="ml-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -199,11 +295,48 @@ const ResourcesPage = () => {
             </div>
           </div>
           
+          {/* Related Topics */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2">
+              {getRelatedCategories().map((category, index) => (
+                <Button 
+                  key={index} 
+                  variant="outline" 
+                  className="bg-white hover:bg-herhealth-pink-light/20"
+                  onClick={() => setSearchQuery(category)}
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+          </div>
+          
           {/* Articles Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredArticles.length > 0 ? (
+            {loading ? (
+              // Loading state
+              Array.from({ length: 6 }).map((_, i) => (
+                <Card key={`skeleton-${i}`} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded w-full mb-2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  </CardContent>
+                  <CardFooter className="pt-0">
+                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                  </CardFooter>
+                </Card>
+              ))
+            ) : filteredArticles.length > 0 ? (
               filteredArticles.map((article) => (
-                <Card key={article.id} className="hover:shadow-md transition-shadow">
+                <Card 
+                  key={article.id} 
+                  className="hover:shadow-md transition-shadow hover-scale cursor-pointer"
+                  onClick={() => handleArticleClick(article)}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-center text-sm text-gray-500 mb-2">
                       {getCategoryIcon(article.category)}
@@ -222,7 +355,7 @@ const ResourcesPage = () => {
                   <CardFooter className="pt-0">
                     <Button variant="ghost" size="sm" className="text-herhealth-pink-dark hover:text-herhealth-pink flex items-center p-0">
                       Read More
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      {article.url ? <ExternalLink className="ml-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -232,8 +365,30 @@ const ResourcesPage = () => {
                 <SearchIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-4 text-lg font-medium text-gray-900">No resources found</h3>
                 <p className="mt-1 text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => { 
+                    setSearchQuery(''); 
+                    setActiveCategory('all'); 
+                  }}
+                >
+                  Clear filters
+                </Button>
               </div>
             )}
+          </div>
+          
+          {/* Newsletter Signup */}
+          <div className="mt-12 bg-herhealth-pink-light/30 rounded-lg p-6 text-center">
+            <h2 className="text-xl font-semibold mb-2">Stay Updated</h2>
+            <p className="mb-4">Subscribe to our newsletter for the latest women's health insights and resources</p>
+            <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <Input placeholder="Your email address" type="email" className="flex-grow" />
+              <Button className="bg-herhealth-pink-dark hover:bg-herhealth-pink text-white">
+                Subscribe
+              </Button>
+            </div>
           </div>
         </div>
       </div>
