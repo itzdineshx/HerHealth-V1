@@ -23,8 +23,8 @@ const AIHealthChatPage = () => {
       <div className="py-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold">AI Health Assistant</h1>
-            <p className="text-gray-600">Get personalized health information and advice</p>
+            <h1 className="text-3xl font-bold">Gemini Health Assistant</h1>
+            <p className="text-gray-600">Get personalized health information and advice powered by Google's Gemini AI</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -42,7 +42,7 @@ const AIHealthChatPage = () => {
                 </CardHeader>
                 <CardContent className="pt-4">
                   <p className="text-sm text-gray-600">
-                    Our AI Health Assistant can answer questions about women's health, 
+                    Our Gemini-powered AI Health Assistant can answer questions about women's health, 
                     cycle tracking, wellness, and provide general health information.
                   </p>
                   
@@ -81,6 +81,10 @@ const AIHealthChatPage = () => {
                       <strong>Note:</strong> This assistant provides general health information only. 
                       Always consult with healthcare professionals for medical advice.
                     </p>
+                  </div>
+                  
+                  <div className="mt-4 text-center">
+                    <p className="text-xs text-gray-500">Powered by Google's Gemini AI</p>
                   </div>
                 </CardContent>
               </Card>

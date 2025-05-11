@@ -24,7 +24,7 @@ export const AiInsightsWidget = () => {
         <CardHeader className="bg-gradient-to-r from-herhealth-blue-light/50 to-herhealth-purple-light/50 pb-2">
           <div className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            <CardTitle>AI Wellness Insights</CardTitle>
+            <CardTitle>Gemini AI Insights</CardTitle>
           </div>
           <CardDescription>Analyzing your patterns...</CardDescription>
         </CardHeader>
@@ -46,7 +46,7 @@ export const AiInsightsWidget = () => {
         <CardHeader className="bg-gradient-to-r from-herhealth-blue-light/50 to-herhealth-purple-light/50 pb-2">
           <div className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            <CardTitle>AI Wellness Insights</CardTitle>
+            <CardTitle>Gemini AI Insights</CardTitle>
           </div>
           <CardDescription>Personalized for you</CardDescription>
         </CardHeader>
@@ -68,11 +68,11 @@ export const AiInsightsWidget = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            <CardTitle>AI Wellness Insights</CardTitle>
+            <CardTitle>Gemini AI Insights</CardTitle>
           </div>
           <Sparkles className="h-4 w-4 text-herhealth-blue-dark" />
         </div>
-        <CardDescription>Updated {new Date().toLocaleDateString()}</CardDescription>
+        <CardDescription>Updated {new Date().toLocaleDateString()} • Powered by Google's Gemini</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-4">

@@ -1,7 +1,12 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "@/components/ui/use-toast";
 import { fetchCycleLogs, fetchSymptomLogs, fetchActivityLogs } from "./apiService";
+
+// Gemini API key - in production, this should come from environment variables or Supabase secrets
+const GEMINI_API_KEY = "AIzaSyCGo4QPLUtsHTzO0f1E-rBaWumWoSKO2dY";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 export type AIInsight = {
   id: string;
@@ -12,13 +17,90 @@ export type AIInsight = {
   confidence: number;
 };
 
-// This function now directly returns mock insights without trying to query a non-existent table
+// Function to call Gemini API
+const callGeminiAPI = async (prompt: string): Promise<string> => {
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Gemini API error:", errorData);
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Extract the response text from Gemini's response structure
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && 
+        data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      console.error("Unexpected Gemini response structure:", data);
+      throw new Error("Invalid response format from Gemini");
+    }
+  } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    throw error;
+  }
+};
+
+// This function now uses Gemini API to generate personalized insights
 export const fetchPersonalizedInsights = async (userId: string): Promise<AIInsight[]> => {
   try {
     console.log("Fetching insights for user:", userId);
     
-    // In a real implementation, we would query the AI insights table
-    // Since that table doesn't exist in the current schema, we'll use mock data
+    // First try to get from Gemini API
+    try {
+      const userPrompt = `Generate 4 personalized health insights for a woman's health app user. 
+      Format as JSON array with these properties: title (short), description (1-2 sentences), 
+      type (one of: recommendation, prediction, insight), 
+      category (one of: cycle, nutrition, activity, sleep, mental), 
+      confidence (number between 0.6 and 0.95).
+      Make insights specific to women's health topics like cycle tracking, hormonal health, 
+      nutrition based on cycle phase, and mental wellbeing.`;
+      
+      const geminiResponse = await callGeminiAPI(userPrompt);
+      
+      try {
+        // Parse the JSON response from Gemini
+        const parsedInsights = JSON.parse(geminiResponse);
+        
+        // Validate and transform the response
+        if (Array.isArray(parsedInsights) && parsedInsights.length > 0) {
+          return parsedInsights.map(insight => ({
+            id: uuidv4(),
+            title: insight.title || "Health Insight",
+            description: insight.description || "Personalized health recommendation based on your data",
+            type: ["recommendation", "prediction", "insight"].includes(insight.type) 
+              ? insight.type 
+              : "recommendation",
+            category: ["cycle", "nutrition", "activity", "sleep", "mental"].includes(insight.category)
+              ? insight.category
+              : "cycle",
+            confidence: typeof insight.confidence === 'number' && insight.confidence >= 0.6 && insight.confidence <= 0.95
+              ? insight.confidence
+              : 0.8
+          }));
+        }
+      } catch (parseError) {
+        console.error("Error parsing Gemini response:", parseError);
+        console.log("Raw response:", geminiResponse);
+      }
+    } catch (geminiError) {
+      console.error("Error using Gemini for insights:", geminiError);
+    }
+    
+    // Fall back to mock insights if Gemini fails
     return generateMockInsights(userId);
   } catch (error) {
     console.error("Error in fetchPersonalizedInsights:", error);
@@ -26,24 +108,40 @@ export const fetchPersonalizedInsights = async (userId: string): Promise<AIInsig
   }
 };
 
-// Mock chat message function
+// Chat message function using Gemini
 export const sendChatMessage = async (userId: string, message: string): Promise<string> => {
   console.log("Sending chat message for user:", userId, message);
   
   try {
-    // First try to send to backend AI service
-    const { data, error } = await supabase
-      .functions.invoke('health-assistant-chat', {
-        body: { userId, message }
-      });
-    
-    if (error) {
-      console.error("Error sending message to AI service:", error);
-      throw error;
-    }
-    
-    if (data && data.response) {
-      return data.response;
+    // First try to use Gemini API
+    try {
+      const userPrompt = `You are a health assistant for a women's health app called HerHealth. 
+      A user has sent this message: "${message}"
+      
+      Respond in a helpful, accurate, and compassionate way. Focus on women's health topics like menstrual cycles, 
+      pregnancy, menopause, general wellness, and mental health. If asked about serious medical conditions, 
+      remind the user to consult with healthcare professionals.
+      
+      Keep your response under 150 words and maintain a supportive tone.`;
+      
+      return await callGeminiAPI(userPrompt);
+    } catch (geminiError) {
+      console.error("Error using Gemini for chat:", geminiError);
+      
+      // Try to send to backend AI service as backup
+      const { data, error } = await supabase
+        .functions.invoke('health-assistant-chat', {
+          body: { userId, message }
+        });
+      
+      if (error) {
+        console.error("Error sending message to AI service:", error);
+        throw error;
+      }
+      
+      if (data && data.response) {
+        return data.response;
+      }
     }
     
     // Fallback with mock responses
@@ -52,6 +150,70 @@ export const sendChatMessage = async (userId: string, message: string): Promise<
     console.error("Error in sendChatMessage:", error);
     // Fall back to mock response
     return generateMockResponse(message);
+  }
+};
+
+// Generate workout recommendations using Gemini
+export const generateWorkoutRecommendations = async (
+  userId: string, 
+  cyclePhase: string,
+  fitnessLevel: string,
+  preferences: string[]
+): Promise<any[]> => {
+  try {
+    const userPrompt = `Generate 3 workout recommendations for a woman in her ${cyclePhase} phase of menstrual cycle.
+    Fitness level: ${fitnessLevel}
+    Preferences: ${preferences.join(', ')}
+    
+    Format as JSON array with these properties for each workout:
+    - title: brief workout name
+    - description: 1-2 sentences about the workout
+    - duration: time in minutes (between 15-60)
+    - intensity: "low", "moderate", or "high"
+    - benefits: array of 2-3 health benefits
+    - exercises: array of 3-5 specific exercises to do`;
+    
+    try {
+      const geminiResponse = await callGeminiAPI(userPrompt);
+      const parsedWorkouts = JSON.parse(geminiResponse);
+      
+      if (Array.isArray(parsedWorkouts) && parsedWorkouts.length > 0) {
+        return parsedWorkouts;
+      }
+    } catch (geminiError) {
+      console.error("Error using Gemini for workouts:", geminiError);
+    }
+    
+    // Fallback to mock workouts
+    return [
+      {
+        title: "Gentle Flow Yoga",
+        description: "A low-impact yoga session focused on relaxation and flexibility",
+        duration: 30,
+        intensity: "low",
+        benefits: ["Stress reduction", "Improved flexibility", "Better sleep"],
+        exercises: ["Cat-cow pose", "Child's pose", "Gentle twists", "Forward folds"]
+      },
+      {
+        title: "Strength Building Circuit",
+        description: "Build muscle and boost metabolism with this strength workout",
+        duration: 45,
+        intensity: "moderate",
+        benefits: ["Increased strength", "Metabolism boost", "Improved posture"],
+        exercises: ["Squats", "Modified push-ups", "Dumbbell rows", "Bridges"]
+      },
+      {
+        title: "Cardio Dance",
+        description: "Fun dance-based cardio to boost mood and energy",
+        duration: 25,
+        intensity: "moderate",
+        benefits: ["Mood elevation", "Cardiovascular health", "Coordination"],
+        exercises: ["Warm-up", "Dance intervals", "Stretching", "Cool down"]
+      }
+    ];
+  } catch (error) {
+    console.error("Error generating workout recommendations:", error);
+    return [];
   }
 };
 
@@ -67,7 +229,42 @@ export const fetchMoodPredictions = async (userId: string): Promise<{ day: strin
       fetchActivityLogs(userId)
     ]);
     
-    // Try to get from backend AI service first
+    // Try to generate predictions using Gemini
+    try {
+      // Convert user data to simplified format for the prompt
+      const cycleData = JSON.stringify(cycles).substring(0, 200) + "...";
+      const symptomData = JSON.stringify(symptoms).substring(0, 200) + "...";
+      
+      const userPrompt = `Based on this partial cycle data: ${cycleData}
+      And symptom data: ${symptomData}
+      
+      Generate mood and energy predictions for the next 14 days (starting today).
+      Return as JSON array with objects for each day containing:
+      - day: date in YYYY-MM-DD format
+      - mood: number between 30-95
+      - energy: number between 25-90
+      
+      Create realistic patterns that follow cyclical hormonal changes.`;
+      
+      const geminiResponse = await callGeminiAPI(userPrompt);
+      
+      try {
+        const parsedPredictions = JSON.parse(geminiResponse);
+        if (Array.isArray(parsedPredictions) && parsedPredictions.length > 0) {
+          return parsedPredictions.map(pred => ({
+            day: pred.day,
+            mood: pred.mood,
+            energy: pred.energy
+          }));
+        }
+      } catch (parseError) {
+        console.error("Error parsing Gemini predictions:", parseError);
+      }
+    } catch (geminiError) {
+      console.error("Error using Gemini for mood predictions:", geminiError);
+    }
+    
+    // Try to get from backend AI service if Gemini fails
     const { data, error } = await supabase
       .functions.invoke('mood-prediction', {
         body: { userId, cycles, symptoms, activities }

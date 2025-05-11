@@ -24,7 +24,7 @@ export const AiHealthAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm your health assistant. I can answer questions about women's health, cycle tracking, and wellness. How can I help you today?",
+      content: "Hello! I'm your Gemini-powered health assistant. I can answer questions about women's health, cycle tracking, and wellness. How can I help you today?",
       sender: 'assistant',
       timestamp: new Date(),
     },
@@ -84,7 +84,7 @@ export const AiHealthAssistant = () => {
       <CardHeader className="pb-2 bg-gradient-to-r from-herhealth-pink-light/70 to-herhealth-purple-light/70">
         <CardTitle className="flex items-center gap-2 text-balance">
           <Brain className="h-5 w-5" />
-          Health Assistant
+          Gemini Health Assistant
           <Sparkles className="h-4 w-4 text-herhealth-pink-dark ml-auto" />
         </CardTitle>
       </CardHeader>
@@ -142,6 +142,7 @@ export const AiHealthAssistant = () => {
               <Send className="h-4 w-4" />
             </Button>
           </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">Powered by Google's Gemini AI</p>
         </div>
       </CardContent>
     </Card>
