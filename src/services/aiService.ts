@@ -12,41 +12,16 @@ export type AIInsight = {
   confidence: number;
 };
 
-// Mock insights data function - in production, this would call an AI API
+// This function now directly returns mock insights without trying to query a non-existent table
 export const fetchPersonalizedInsights = async (userId: string): Promise<AIInsight[]> => {
   try {
     console.log("Fetching insights for user:", userId);
     
-    // Attempt to get real data from API first
-    const { data, error } = await supabase
-      .from("ai_insights")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(5);
-    
-    if (error) {
-      console.error("Error fetching insights:", error);
-      throw error;
-    }
-    
-    if (data && data.length > 0) {
-      // Transform data to match our app schema
-      return data.map(insight => ({
-        id: insight.id,
-        title: insight.title,
-        description: insight.description,
-        type: insight.type as 'recommendation' | 'prediction' | 'insight',
-        category: insight.category as 'cycle' | 'nutrition' | 'activity' | 'sleep' | 'mental',
-        confidence: insight.confidence
-      }));
-    }
-    
-    // If no data from API or empty, generate mock insights
+    // In a real implementation, we would query the AI insights table
+    // Since that table doesn't exist in the current schema, we'll use mock data
     return generateMockInsights(userId);
   } catch (error) {
     console.error("Error in fetchPersonalizedInsights:", error);
-    // Fall back to mock data in case of error
     return generateMockInsights(userId);
   }
 };
