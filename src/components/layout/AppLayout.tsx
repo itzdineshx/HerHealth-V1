@@ -2,7 +2,7 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { Toaster } from "@/components/ui/toaster";
-import { ScrollToTop } from "@/utils/ScrollToTop";
+import ScrollToTop from "@/utils/ScrollToTop";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";

@@ -63,6 +63,16 @@ export const Navbar = () => {
     });
     navigate("/");
   };
+
+  // Get profile photo URL or use default image
+  const getProfileImage = () => {
+    return user?.image || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000";
+  };
+
+  // Get user initial for avatar fallback
+  const getUserInitial = () => {
+    return user?.name?.charAt(0) || "U";
+  };
   
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -137,8 +147,8 @@ export const Navbar = () => {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="rounded-full p-1 h-9 w-9">
                         <Avatar>
-                          <AvatarImage src={user?.photoURL || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000"} alt="Profile" />
-                          <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                          <AvatarImage src={getProfileImage()} alt="Profile" />
+                          <AvatarFallback>{getUserInitial()}</AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
@@ -171,8 +181,8 @@ export const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="rounded-full p-1 h-9 w-9">
                       <Avatar>
-                        <AvatarImage src={user?.photoURL || "https://img.icons8.com/?size=100&id=A2cvMrJpftoK&format=png&color=000000"} alt="Profile" />
-                        <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarImage src={getProfileImage()} alt="Profile" />
+                        <AvatarFallback>{getUserInitial()}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
