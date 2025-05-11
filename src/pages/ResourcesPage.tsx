@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +27,41 @@ const ResourcesPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Add AI-powered wellness resources to the default articles
+  const aiWellnessResources: ResourceArticle[] = [
+    {
+      id: "ai-wellness-1",
+      title: "AI-Powered Nutrition: Personalized Meal Plans for Your Cycle",
+      description: "Learn how our Gemini AI technology creates custom meal suggestions based on your cycle phase and dietary preferences.",
+      category: "wellness",
+      readTime: 7,
+      imageSrc: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1180&auto=format&fit=crop",
+      url: "/ai-wellness",
+      featured: true
+    },
+    {
+      id: "ai-wellness-2",
+      title: "Sleep Better with AI: Cycle-Optimized Rest Strategies",
+      description: "Discover how our AI assistant analyzes your cycle data to provide personalized sleep recommendations for better rest.",
+      category: "wellness",
+      readTime: 5,
+      imageSrc: "https://images.unsplash.com/photo-1455642305367-68834a9e7cb9?q=80&w=1169&auto=format&fit=crop",
+      url: "/ai-wellness"
+    },
+    {
+      id: "ai-wellness-3",
+      title: "AI Workout Recommendations: Exercise Based on Your Hormones",
+      description: "Maximize your fitness results with AI-powered workout suggestions tailored to your hormonal fluctuations throughout your cycle.",
+      category: "wellness",
+      readTime: 8,
+      imageSrc: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1170&auto=format&fit=crop",
+      url: "/ai-wellness"
+    }
+  ];
+  
+  // Add the AI wellness resources to the default articles
+  const allDefaultArticles = [...defaultArticles, ...aiWellnessResources];
   
   useEffect(() => {
     // Load articles from API or use mock data
@@ -60,8 +94,8 @@ const ResourcesPage = () => {
           
           setArticles(formattedArticles);
         } else {
-          // Fall back to default mock data
-          setArticles(defaultArticles);
+          // Fall back to default mock data with AI resources
+          setArticles(allDefaultArticles);
         }
       } catch (error) {
         console.error("Error loading articles:", error);
@@ -70,7 +104,7 @@ const ResourcesPage = () => {
           description: "Failed to load resource articles. Using default content.",
           variant: "destructive"
         });
-        setArticles(defaultArticles);
+        setArticles(allDefaultArticles);
       } finally {
         setLoading(false);
       }
@@ -200,6 +234,7 @@ const ResourcesPage = () => {
     }
   };
 
+  // Update the getRelatedCategories function to include AI topics
   const getRelatedCategories = () => {
     switch (activeCategory) {
       case "menopause":
@@ -209,9 +244,9 @@ const ResourcesPage = () => {
       case "pregnancy":
         return ["First Trimester", "Nutrition", "Exercise", "Postpartum"];
       case "wellness":
-        return ["Fitness", "Nutrition", "Sleep", "Mindfulness"];
+        return ["AI Nutrition", "Sleep Optimization", "AI Workouts", "Mindfulness"];
       default:
-        return ["Popular Topics", "Latest Articles", "Most Read", "Editor's Choice"];
+        return ["Popular Topics", "AI Wellness", "Latest Articles", "Editor's Choice"];
     }
   };
 

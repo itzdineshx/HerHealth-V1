@@ -1,100 +1,67 @@
 
-import React, { Suspense, lazy } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
-import ErrorBoundary from "./components/layout/ErrorBoundary";
-import ScrollToTop from "./utils/ScrollToTop";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "./components/ui/toaster"; 
+import HomePage from "./pages/HomePage";
+import DashboardPage from "./pages/DashboardPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import NotFound from "./pages/NotFound";
+import CycleTrackerPage from "./pages/CycleTrackerPage";
+import ResourcesPage from "./pages/ResourcesPage";
+import WellnessHubPage from "./pages/WellnessHubPage";
+import AIHealthChatPage from "./pages/AIHealthChatPage";
+import MenopausePage from "./pages/MenopausePage";
+import MentalHealthPage from "./pages/MentalHealthPage";
+import PregnancyPage from "./pages/PregnancyPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import NotificationsPage from "./pages/NotificationsPage";
+import OnboardingPage from "./pages/OnboardingPage";
+import ContactPage from "./pages/ContactPage";
+import AIWellnessPage from "./pages/AIWellnessPage";
+import { AuthProvider } from "./context/AuthContext";
+import "./App.css";
 
-// Pages
-const HomePage = lazy(() => import("./pages/HomePage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const SignupPage = lazy(() => import("./pages/SignupPage"));
-const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
-const CycleTrackerPage = lazy(() => import("./pages/CycleTrackerPage"));
-const WellnessHubPage = lazy(() => import("./pages/WellnessHubPage"));
-const MentalHealthPage = lazy(() => import("./pages/MentalHealthPage"));
-const PregnancyPage = lazy(() => import("./pages/PregnancyPage"));
-const MenopausePage = lazy(() => import("./pages/MenopausePage"));
-const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
-const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
-const TermsPage = lazy(() => import("./pages/TermsPage"));
-const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
-const AIHealthChatPage = lazy(() => import("./pages/AIHealthChatPage"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
-const ContactPage = lazy(() => import("./pages/ContactPage"));
-
-// Loading Component
-const LoadingSpinner = () => (
-  <div className="h-screen w-screen flex flex-col items-center justify-center">
-    <div className="w-16 h-16 border-4 border-herhealth-pink-light border-t-herhealth-pink-dark rounded-full animate-spin"></div>
-    <p className="mt-4 text-herhealth-pink-dark">Loading...</p>
-  </div>
-);
-
-// Create QueryClient with improved caching settings
+// Create a react-query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      gcTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     },
   },
 });
 
-const App: React.FC = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ErrorBoundary>
+        <Router>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/cycle-tracker" element={<CycleTrackerPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/wellness-hub" element={<WellnessHubPage />} />
+            <Route path="/ai-wellness" element={<AIWellnessPage />} />
+            <Route path="/ai-health-chat" element={<AIHealthChatPage />} />
+            <Route path="/menopause" element={<MenopausePage />} />
+            <Route path="/mental-health" element={<MentalHealthPage />} />
+            <Route path="/pregnancy" element={<PregnancyPage />} />
+            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/onboarding" element={<OnboardingPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/cycle" element={<CycleTrackerPage />} />
-                <Route path="/wellness" element={<WellnessHubPage />} />
-                <Route path="/mental-health" element={<MentalHealthPage />} />
-                <Route path="/pregnancy" element={<PregnancyPage />} />
-                <Route path="/menopause" element={<MenopausePage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/profile" element={<UserProfilePage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/ai-health-chat" element={<AIHealthChatPage />} />
-                <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                
-                {/* Additional pages mentioned in footer */}
-                <Route path="/support" element={<ContactPage />} />  {/* Reuse ContactPage for now */}
-                <Route path="/cookies" element={<PrivacyPolicyPage />} />  {/* Reuse PrivacyPage for now */}
-                <Route path="/accessibility" element={<TermsPage />} />  {/* Reuse TermsPage for now */}
-                
-                {/* Redirect /index.html to home page */}
-                <Route path="/index.html" element={<Navigate to="/" replace />} />
-                
-                {/* Catch-all route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </ErrorBoundary>
+        </Router>
       </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+}
 
 export default App;
