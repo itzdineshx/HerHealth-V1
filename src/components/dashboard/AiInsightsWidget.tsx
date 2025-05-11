@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Lightbulb, TrendingUp } from "lucide-react";
+import { Brain, Lightbulb, TrendingUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
@@ -20,12 +20,12 @@ export const AiInsightsWidget = () => {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader className="bg-herhealth-blue-light/30 pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            AI Wellness Insights
-          </CardTitle>
+      <Card hover glass>
+        <CardHeader className="bg-gradient-to-r from-herhealth-blue-light/50 to-herhealth-purple-light/50 pb-2">
+          <div className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            <CardTitle>AI Wellness Insights</CardTitle>
+          </div>
           <CardDescription>Analyzing your patterns...</CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
@@ -42,12 +42,12 @@ export const AiInsightsWidget = () => {
 
   if (isError || !insights) {
     return (
-      <Card>
-        <CardHeader className="bg-herhealth-blue-light/30 pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            AI Wellness Insights
-          </CardTitle>
+      <Card hover glass>
+        <CardHeader className="bg-gradient-to-r from-herhealth-blue-light/50 to-herhealth-purple-light/50 pb-2">
+          <div className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            <CardTitle>AI Wellness Insights</CardTitle>
+          </div>
           <CardDescription>Personalized for you</CardDescription>
         </CardHeader>
         <CardContent className="pt-4 text-center">
@@ -63,18 +63,21 @@ export const AiInsightsWidget = () => {
   }
 
   return (
-    <Card>
-      <CardHeader className="bg-herhealth-blue-light/30 pb-2">
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5" />
-          AI Wellness Insights
-        </CardTitle>
+    <Card hover className="glass-effect">
+      <CardHeader className="bg-gradient-to-r from-herhealth-blue-light/50 to-herhealth-purple-light/50 pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            <CardTitle>AI Wellness Insights</CardTitle>
+          </div>
+          <Sparkles className="h-4 w-4 text-herhealth-blue-dark" />
+        </div>
         <CardDescription>Updated {new Date().toLocaleDateString()}</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-4">
           {insights.map((insight, index) => (
-            <div key={index} className="p-3 rounded-lg border bg-white">
+            <div key={index} className="p-3 rounded-lg border bg-white/70 dark:bg-black/20 backdrop-blur-sm shadow-sm hover:shadow-md transition-all">
               <div className="flex items-start gap-3">
                 {insight.type === 'prediction' ? (
                   <TrendingUp className="h-5 w-5 text-herhealth-blue-dark mt-0.5" />
@@ -82,8 +85,8 @@ export const AiInsightsWidget = () => {
                   <Lightbulb className="h-5 w-5 text-herhealth-pink-dark mt-0.5" />
                 )}
                 <div>
-                  <h4 className="text-sm font-medium mb-1">{insight.title}</h4>
-                  <p className="text-sm text-gray-600">{insight.description}</p>
+                  <h4 className="text-sm font-medium mb-1 text-balance">{insight.title}</h4>
+                  <p className="text-sm text-gray-600 text-balance">{insight.description}</p>
                 </div>
               </div>
             </div>
