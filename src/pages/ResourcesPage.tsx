@@ -20,6 +20,84 @@ interface ResourceArticle {
   featured?: boolean;
 }
 
+// Default articles data
+const defaultArticles: ResourceArticle[] = [
+  {
+    id: "1",
+    title: "Understanding Perimenopause: Early Signs and Symptoms",
+    description: "Learn about the early warning signs of perimenopause and how to manage the transition.",
+    category: "menopause",
+    readTime: 8,
+    imageSrc: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.mayoclinic.org/diseases-conditions/perimenopause/symptoms-causes/syc-20354666",
+    featured: true
+  },
+  {
+    id: "2",
+    title: "The Connection Between Hormones and Mental Health",
+    description: "Explore how hormonal changes throughout your life can impact your mental wellbeing.",
+    category: "mentalhealth",
+    readTime: 12,
+    imageSrc: "https://images.unsplash.com/photo-1505455184862-554165e5f6ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.womenshealth.gov/mental-health/mental-health-conditions/depression"
+  },
+  {
+    id: "3",
+    title: "Nutrition During Pregnancy: Trimester by Trimester",
+    description: "A comprehensive guide to nutrition needs during each stage of pregnancy.",
+    category: "pregnancy",
+    readTime: 15,
+    imageSrc: "https://images.unsplash.com/photo-1595924736292-f0e1c3d2a8cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy"
+  },
+  {
+    id: "4",
+    title: "Hot Flash Management Strategies That Actually Work",
+    description: "Evidence-based approaches to managing hot flashes during menopause.",
+    category: "menopause",
+    readTime: 7,
+    imageSrc: "https://images.unsplash.com/photo-1559662780-c3bab6f7e00b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.menopause.org/for-women/menopauseflashes/menopause-symptoms-and-treatments/managing-hot-flashes"
+  },
+  {
+    id: "5",
+    title: "Building a Sustainable Self-Care Routine",
+    description: "How to create and maintain a self-care practice that fits your lifestyle.",
+    category: "wellness",
+    readTime: 5,
+    imageSrc: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.nih.gov/health-information/emotional-wellness-toolkit",
+    featured: true
+  },
+  {
+    id: "6",
+    title: "Understanding Your Menstrual Cycle's Four Phases",
+    description: "A detailed look at each phase of your cycle and how it affects your body and mind.",
+    category: "general",
+    readTime: 10,
+    imageSrc: "https://images.unsplash.com/photo-1584805646889-c9ba8e3ebc23?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle"
+  },
+  {
+    id: "7",
+    title: "Hormone Replacement Therapy: Benefits and Risks",
+    description: "The latest research on HRT to help you make an informed decision with your healthcare provider.",
+    category: "menopause",
+    readTime: 14,
+    imageSrc: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.nia.nih.gov/health/hormone-replacement-therapy-menopause-symptoms-risks"
+  },
+  {
+    id: "8",
+    title: "Mindfulness Practices for Anxiety Relief",
+    description: "Simple mindfulness techniques you can practice daily to reduce anxiety.",
+    category: "mentalhealth",
+    readTime: 6,
+    imageSrc: "https://images.unsplash.com/photo-1592554379916-8e6bf5f17aa3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    url: "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
+  }
+];
+
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -112,84 +190,6 @@ const ResourcesPage = () => {
     
     loadArticles();
   }, [activeCategory, toast]);
-  
-  // Default articles data
-  const defaultArticles: ResourceArticle[] = [
-    {
-      id: "1",
-      title: "Understanding Perimenopause: Early Signs and Symptoms",
-      description: "Learn about the early warning signs of perimenopause and how to manage the transition.",
-      category: "menopause",
-      readTime: 8,
-      imageSrc: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.mayoclinic.org/diseases-conditions/perimenopause/symptoms-causes/syc-20354666",
-      featured: true
-    },
-    {
-      id: "2",
-      title: "The Connection Between Hormones and Mental Health",
-      description: "Explore how hormonal changes throughout your life can impact your mental wellbeing.",
-      category: "mentalhealth",
-      readTime: 12,
-      imageSrc: "https://images.unsplash.com/photo-1505455184862-554165e5f6ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.womenshealth.gov/mental-health/mental-health-conditions/depression"
-    },
-    {
-      id: "3",
-      title: "Nutrition During Pregnancy: Trimester by Trimester",
-      description: "A comprehensive guide to nutrition needs during each stage of pregnancy.",
-      category: "pregnancy",
-      readTime: 15,
-      imageSrc: "https://images.unsplash.com/photo-1595924736292-f0e1c3d2a8cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy"
-    },
-    {
-      id: "4",
-      title: "Hot Flash Management Strategies That Actually Work",
-      description: "Evidence-based approaches to managing hot flashes during menopause.",
-      category: "menopause",
-      readTime: 7,
-      imageSrc: "https://images.unsplash.com/photo-1559662780-c3bab6f7e00b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.menopause.org/for-women/menopauseflashes/menopause-symptoms-and-treatments/managing-hot-flashes"
-    },
-    {
-      id: "5",
-      title: "Building a Sustainable Self-Care Routine",
-      description: "How to create and maintain a self-care practice that fits your lifestyle.",
-      category: "wellness",
-      readTime: 5,
-      imageSrc: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.nih.gov/health-information/emotional-wellness-toolkit",
-      featured: true
-    },
-    {
-      id: "6",
-      title: "Understanding Your Menstrual Cycle's Four Phases",
-      description: "A detailed look at each phase of your cycle and how it affects your body and mind.",
-      category: "general",
-      readTime: 10,
-      imageSrc: "https://images.unsplash.com/photo-1584805646889-c9ba8e3ebc23?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle"
-    },
-    {
-      id: "7",
-      title: "Hormone Replacement Therapy: Benefits and Risks",
-      description: "The latest research on HRT to help you make an informed decision with your healthcare provider.",
-      category: "menopause",
-      readTime: 14,
-      imageSrc: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.nia.nih.gov/health/hormone-replacement-therapy-menopause-symptoms-risks"
-    },
-    {
-      id: "8",
-      title: "Mindfulness Practices for Anxiety Relief",
-      description: "Simple mindfulness techniques you can practice daily to reduce anxiety.",
-      category: "mentalhealth",
-      readTime: 6,
-      imageSrc: "https://images.unsplash.com/photo-1592554379916-8e6bf5f17aa3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      url: "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
-    }
-  ];
   
   const filterArticles = () => {
     return articles.filter(article => {
