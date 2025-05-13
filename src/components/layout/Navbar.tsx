@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -45,26 +44,11 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
   const isActive = (href: string) => {
     return location.pathname === href;
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -85,14 +69,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav 
-      className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
-        scrolled 
-          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md" 
-          : "bg-white dark:bg-gray-900"
-      )}
-    >
+    <nav className="w-full border-b bg-white dark:bg-gray-900 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
