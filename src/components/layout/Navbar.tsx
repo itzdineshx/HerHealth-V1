@@ -58,12 +58,12 @@ export const Navbar = () => {
               HerHealth
             </Link>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className="ml-6 flex items-center">
                 {mainNavItems.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium ${
+                    className={`text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-sm font-medium ${
                       isActive(item.href)
                         ? "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
                         : ""

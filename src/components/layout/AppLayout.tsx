@@ -35,7 +35,7 @@ export const AppLayout = ({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </Helmet>
       
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-background to-muted/30">
+      <div className="flex flex-col min-h-screen bg-[#FFF5F7]">
         <Navbar />
         <main className="flex-grow animate-in">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
